@@ -22,7 +22,6 @@ class MLP(nn.Module):
         return x
 
 model = MLP()
-print(jax.random.key(0))
 print(model.tabulate(jax.random.PRNGKey(1), x=jnp.ones((1, 28 * 28))))
 
 X, y = fetch_openml("mnist_784", version=1, as_frame=False, return_X_y=True)
