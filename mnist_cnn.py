@@ -15,6 +15,9 @@ def conv2d(W, x):
 def linear(W, b, x):
     return jnp.dot(W, x) + b
 
+def max_pool(x, window_size=2):
+    return jax.lax.reduce_window(x, -jnp.inf, jax.lax.max, (window_size, window_size, 1), (window_size, window_size, 1), padding='VALID')
+
 def relu(x):
     return jnp.maximum(0, x)
 
@@ -33,10 +36,10 @@ def categorical_cross_entropy(y, y_hat, n_classes=10, one_hot=True):
 def model(params, x):
     x = conv2d(params['C1'], x)[0]
     x = relu(x)
-    x = jax.lax.reduce_window(x, -jnp.inf, jax.lax.max, (2, 2, 1), (2, 2, 1), padding='VALID')
+    x = max_pool(x, window_size=2)
     x = conv2d(params['C2'], x)[0]
     x = relu(x)
-    x = jax.lax.reduce_window(x, -jnp.inf, jax.lax.max, (2, 2, 1), (2, 2, 1), padding='VALID')
+    x = max_pool(x, window_size=2)
 
     x = x.reshape((-1, ))
     x = linear(params['W1'], params['b1'], x)
